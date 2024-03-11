@@ -365,6 +365,7 @@
 			<fileset file="${war.dir}/js/jszip/jszip.min.js"/>
 			<fileset file="${war.dir}/js/mermaid/mermaid.min.js"/>
 			<fileset file="${war.dir}/js/orgchart.min.js"/>
+			<fileset file="${war.dir}/js/mermaid/mermaid2drawio.js"/>
     	</concat>
 		
 		<delete file="${basedir}/.tmp1.js"/>

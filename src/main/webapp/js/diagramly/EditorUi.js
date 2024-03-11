@@ -16432,6 +16432,54 @@
 						this.handleRemoteInvokeResponse(data);
 						return;
 					}
+					else if (data.action == 'mermaid2drawio') //archmate
+					{
+						var insertPoint = this.editor.graph.getFreeInsertPoint();
+						var msg = data.message;
+						var type = data.action;
+						var lines = data.content.split('\n');
+						var pageTitle = data.title;
+						var k = 0;
+						var graph = this.editor.graph;
+
+						this.spinner.spin(document.body, msg);
+
+						while (k < lines.length && (lines[k].trim().length == 0 ||
+							lines[k].substring(0, 2) == '%%')) {
+							k++;
+						}
+
+						var diagramType = lines[k].trim().toLowerCase();
+						var sp = diagramType.indexOf(' ');
+						diagramType = diagramType.substring(0, sp > 0 ? sp : diagramType.length);
+						var inDrawioFormat = typeof mxMermaidToDrawio !== 'undefined' &&
+							type == 'mermaid2drawio' && diagramType != 'gantt' &&
+							diagramType != 'pie' && diagramType != 'timeline' &&
+							diagramType != 'quadrantchart' && diagramType != 'c4context';
+
+						if (inDrawioFormat) {
+							mxMermaidToDrawio.addListener(mxUtils.bind(this, function (modelXml) {
+								graph.setSelectionCells(this.importXml(modelXml,
+									Math.max(insertPoint.x, 20),
+									Math.max(insertPoint.y, 20),
+									true, null, null, true));
+								graph.scrollCellToVisible(graph.getSelectionCell());
+								if (pageTitle) {
+									this.editor.graph.model.execute(new RenamePage(
+										this, this.currentPage, pageTitle));
+								}
+								this.spinner.stop();
+								parent.postMessage(JSON.stringify({ event: 'mermaid2drawio', data: modelXml }), '*');
+							}));
+						}
+						this.generateMermaidImage(data.content, null, function () {
+							if (inDrawioFormat) return;
+						}, function (e) {
+							mxMermaidToDrawio.resetListeners();
+							this.handleError(e);
+						});
+						return;
+					}
 					else
 					{
 						// Unknown message must stop execution
@@ -16442,6 +16490,7 @@
 				}
 				catch (e)
 				{
+					console.log("error", e);
 					// TODO: Block handling of more messages when in error state
 					this.handleError(e);
 				}
