@@ -56,7 +56,6 @@ RUN groupadd -r ${RUN_GROUP} && useradd -g ${RUN_GROUP} -d ${CATALINA_HOME} -s /
 
 USER ${RUN_USER}
 
-# Change directory
 WORKDIR $CATALINA_HOME
 
 EXPOSE 8080 8443
