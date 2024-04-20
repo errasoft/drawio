@@ -1,4 +1,4 @@
-name: Docker CI Cloud Tools
+name: Docker CI
 
 on:
   push:
